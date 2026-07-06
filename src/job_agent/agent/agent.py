@@ -1,7 +1,7 @@
 from langchain_core.messages import (SystemMessage, 
                                      HumanMessage)
 from langchain_ollama import ChatOllama
-from job_agent.prompts.system_prompt import SYSTEM_PROMPT #type:
+from src.job_agent.prompts.system_prompt import SYSTEM_PROMPT 
 
 
 
