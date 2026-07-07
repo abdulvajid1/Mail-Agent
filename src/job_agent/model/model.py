@@ -1,5 +1,5 @@
 from langchain_ollama import ChatOllama
-from src.job_agent.config import MODEL_NAME
+from job_agent.config import MODEL_NAME
 
 
 def load_model():

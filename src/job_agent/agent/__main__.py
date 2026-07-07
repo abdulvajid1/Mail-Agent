@@ -1,11 +1,11 @@
 from langchain_core.messages import (SystemMessage, 
                                      HumanMessage)
 from langchain_core.runnables import RunnableConfig
-from src.job_agent.prompts.system_prompt import SYSTEM_PROMPT 
-from src.job_agent.model import load_model
+from job_agent.prompts.system_prompt import SYSTEM_PROMPT 
+from job_agent.model import load_model
 from langgraph.pregel import Pregel
 
-from .agent import build_graph
+from job_agent.agent import build_graph
 
 def test_graph(app: Pregel, llm):
     user_input = input("Test the graph execution: ")
