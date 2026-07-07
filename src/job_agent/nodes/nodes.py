@@ -8,5 +8,6 @@ def chat_node(state: AgentState, config):
     return {"messages": [ai_message]}
 
 
-def tool_conditional_node(state: AgentState, config):
-    tool_name = state["messages"].tool_calls
+def tool_condition(state: AgentState, config):
+    last_message = state["messages"][-1]
+    breakpoint()
