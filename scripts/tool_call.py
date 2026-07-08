@@ -6,7 +6,6 @@ from langchain.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 
 
-
 def main():
     app = build_graph()
     llm = load_model()
@@ -15,11 +14,9 @@ def main():
     if tools:
         llm = llm.bind_tools(tools)
 
-    tool_registory = {tool.name: tools for tool in tools}
-        
+    tool_registory = {tool.name: tool for tool in tools}
 
-    user_input = "can you send mail to my mother, you can generate a body yourself telling i am sorry for what i have done all these days, my id is vajid@gmail.com and my mothers id is mother@gmail.com"
-    # user_input = "how are you, this is not for mail, i am just asking you" 
+    user_input = "send a mail to my mother@gmail.com saying i am good from me@gmail.com"    
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         HumanMessage(content=user_input)
@@ -31,7 +28,15 @@ def main():
     for msg, _ in app.stream(input_state, config, stream_mode='messages'): # type: ignore
         print(msg.content, end='', flush=True) # type: ignore
 
+    state = app.get_state(config)
+    messages = state.values['messages']
+    for msg in messages:
+        msg.pretty_print()
+
     
 if __name__ == "__main__":
     main()
+
+
+        # user_input = input("User: ")
 
