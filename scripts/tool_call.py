@@ -1,7 +1,7 @@
 from job_agent.agent import build_graph
 from job_agent.model import load_model
 from job_agent.prompts import SYSTEM_PROMPT
-from job_agent.tools import send_mail
+from job_agent.tools import send_dummy_mail
 from langchain.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 
@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnableConfig
 def main():
     app = build_graph()
     llm = load_model()
-    tools = [send_mail]
+    tools = [send_dummy_mail]
 
     if tools:
         llm = llm.bind_tools(tools)
