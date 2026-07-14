@@ -7,7 +7,12 @@ async def main():
         print(f'Client Connection Status: {client.is_connected()}')
         await client.ping()
         tools = await client.list_tools()
-        print(len(tools))
+        print("No. of tools Available: ", len(tools))
+
+        # check if it's langchain compatible
+        print(dir(tools[0]))
+    # tools = await client.get_tools()
+    breakpoint()
     
 
 if __name__ == "__main__":

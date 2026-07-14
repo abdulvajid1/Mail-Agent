@@ -19,8 +19,7 @@ def tool_condition(state: AgentState, config: RunnableConfig):
     else:
         return False
     
-def tool_node(state: AgentState, config: RunnableConfig):
-    # print('hallowwwwwwwwwwwwwwwwwwwwwwww')
+async def tool_node(state: AgentState, config: RunnableConfig):
     tool_calls = state["messages"][-1].tool_calls # type: ignore , [{'name': 'send_mail', 'args': {'to':
     tool_registory = config['configurable']['tools'] # type: ignore {"tool_name": tool}
     tool_messages = []
@@ -28,7 +27,7 @@ def tool_node(state: AgentState, config: RunnableConfig):
         tool_name = tool['name']
         tool_args = tool['args']
         runnable_tool = tool_registory[tool_name]
-        tool_output = runnable_tool.invoke(tool_args)
+        tool_output = await runnable_tool.ainvoke(tool_args)
         tool_messages.append(ToolMessage(content=tool_output, tool_call_id=uuid4()))
 
     return {'messages': tool_messages}
