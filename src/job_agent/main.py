@@ -11,8 +11,13 @@ async def main():
         out = await agent(user_input=user_input)
         user_input = input("\nUser Turn: ")
 
-if __name__ == "__main__":
+
+def main_cli():
     asyncio.run(main())
+
+if __name__ == "__main__":
+    main_cli()
+    
 
 
 
