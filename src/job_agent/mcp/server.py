@@ -14,6 +14,10 @@ async def send_mail(sender: str, subject: str, body: str, recipients: str):
         return "Mail Send Successfully"
     except Exception as e:
         return f"Issue in sending in mail:\n\n {e}"
+
+@mcp.prompt
+async def system_prompt() -> str:
+    return """You are a reliable AI assistant."""
     
 
 def main():
