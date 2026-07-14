@@ -23,4 +23,4 @@ dev = [
 
 
 [project.scripts]
-job-agent = "job_agent.main:main"
+job-agent = "src.job_agent.main:main"

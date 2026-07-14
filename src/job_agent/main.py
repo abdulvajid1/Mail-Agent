@@ -3,11 +3,13 @@ import asyncio
  
 async def main():
     agent = MailAgent()
-    user_input = input("Start your Conversation")
+    agent = await agent.intialize()
+    user_input = input("User Turn: ")
 
     while user_input != "exit":
+        print("Assistent turn: ", end="", flush=True)
         out = await agent(user_input=user_input)
-        user_input = input()
+        user_input = input("\nUser Turn: ")
 
 if __name__ == "__main__":
     asyncio.run(main())

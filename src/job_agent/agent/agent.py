@@ -18,7 +18,7 @@ def build_graph():
     graph.add_edge("chat_node", END)
     app = graph.compile(checkpointer=MemorySaver())
 
-    print(app.get_graph().draw_ascii())
+    # print(app.get_graph().draw_ascii())
     return app
 
 def main():
