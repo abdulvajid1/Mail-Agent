@@ -13,7 +13,7 @@ def connect_to_mcp():
                 "transport": "stdio",  # Local subprocess communication
                 "command": "python",
                 # Absolute path to your math_server.py file
-                "args": ["src/job_agent/mcp/server.py"],
+                "args": [MCP_SERVER_PATH.as_posix()],
             }
         }) # type: ignore
     
