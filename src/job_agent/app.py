@@ -7,6 +7,8 @@ from job_agent.mcp import connect_to_mcp
 from langchain.messages import HumanMessage, SystemMessage, AnyMessage
 from langchain_core.runnables import RunnableConfig
 
+from collections.abc import AsyncIterator
+
 
 class MailAgent():
     def __init__(self) -> None:
@@ -19,7 +21,7 @@ class MailAgent():
         self.system_prompt = None
         self.config = None
         
-    async def intialize(self):
+    async def intialize(self) -> None:
         # initialize cores
         self.available_mcp_tools = await self.mcp_client.get_tools()
         if self.available_mcp_tools:
@@ -32,8 +34,6 @@ class MailAgent():
 
         # initialy the tools will be empty
         self.config = RunnableConfig(configurable={"thread_id": '1', "llm": self.llm, "tools": self.activated_tools})
-
-        return self
 
 
     
@@ -55,13 +55,13 @@ class MailAgent():
             return messages
         
 
-    async def __call__(self, user_input: str) -> Any:
+    async def stream(self, user_input: str) -> AsyncIterator[str]:
 
         messages = self.build_message(user_input=user_input)
         input_state = {"messages": messages} 
 
         async for msg, _ in self.graph.astream(input_state, config=self.config, stream_mode='messages'): #type: ignore
-            print(msg.content, end="", flush=True)
+            yield msg.content #type: ignore
 
     
     def update_tools(self, tools_needed: list):
