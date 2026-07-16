@@ -3,7 +3,7 @@ from email.mime.text import MIMEText
 
 from langchain.tools import tool
 
-from job_agent.utils import getToken
+from job_agent.utils import authorize_google_mail
 from job_agent.utils import generate_oauth2_string
 
 
@@ -25,11 +25,19 @@ def send_dummy_mail(to: str, subject: str, body: str) -> str:
     return f"Email sent to {to} with subject '{subject}' and body '{body}'."
 
 
-def send_email(host, port, subject, msg, sender, recipients):
-    access_token = getToken()
+def send_email(
+        host: str,
+        port: int, 
+        subject: str, 
+        body: str, 
+        sender: str, 
+        recipients: list[str]
+    ):
+    
+    access_token = authorize_google_mail()
     auth_string = generate_oauth2_string(sender, access_token, as_base64=True)
 
-    msg = MIMEText(msg)
+    msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = sender
     msg['To'] = ', '.join(recipients)
@@ -39,3 +47,7 @@ def send_email(host, port, subject, msg, sender, recipients):
     server.docmd('AUTH', 'XOAUTH2 ' + auth_string)
     server.sendmail(sender, recipients, msg.as_string())
     server.quit()
+
+def read_mail(num_emails: int):
+    """Read last {num_emails} emails, return readed mails structure for llm input"""
+    pass

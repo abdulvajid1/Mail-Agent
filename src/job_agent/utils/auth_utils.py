@@ -7,33 +7,23 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.errors import HttpError
 
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://mail.google.com/']
+USER_TOKENS = 'token.json'
+CREDENTIALS = 'credentials.json'
 
-
-def getToken() -> str: # type: ignore
+def authorize_google_mail() -> str: # type: ignore
     """ Gets a valid Google access token with the mail scope permissions. """
-    # If modifying these scopes, delete the file token.json.
-    SCOPES = ['https://mail.google.com/']
-    USER_TOKENS = 'token.json'
-    CREDENTIALS = 'credentials.json'
 
-    creds = None
+    creds = check_user_authentication()
 
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists(USER_TOKENS):
-        try:
-            creds = Credentials.from_authorized_user_file(USER_TOKENS, SCOPES)
-            creds.refresh(Request())
-        except google.auth.exceptions.RefreshError as error:
-            # if refresh token fails, reset creds to none.
-            creds = None
-            print(f'An error occurred: {error}')
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
+            print("Your auth expired")
             creds.refresh(Request())
         else:
+            print("Authenticating for first time")
             flow = InstalledAppFlow.from_client_secrets_file(
                 CREDENTIALS, SCOPES)
             creds = flow.run_local_server(port=0)
@@ -57,3 +47,17 @@ def generate_oauth2_string(username, access_token, as_base64=False) -> str:
     if as_base64:
         auth_string = base64.b64encode(auth_string.encode('ascii')).decode('ascii')
     return auth_string
+
+def check_user_authentication():
+    creds =  None
+    if os.path.exists(USER_TOKENS):
+        try:
+            creds = Credentials.from_authorized_user_file(USER_TOKENS, SCOPES)
+            creds.refresh(Request())
+        except google.auth.exceptions.RefreshError as error:
+            # if refresh token fails, reset creds to none.
+            creds = None
+            print(f'An error occurred: {error}')
+    
+    return creds # this can act as both if authentiation, and as cred if there is any cre
+
