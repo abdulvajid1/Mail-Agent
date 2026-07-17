@@ -5,7 +5,7 @@ from job_agent.model import load_model
 from job_agent.mcp import connect_to_mcp
 from job_agent.utils import load_config
 
-from langchain.messages import HumanMessage, SystemMessage, AnyMessage
+from langchain.messages import HumanMessage, SystemMessage, AnyMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
 
 from collections.abc import AsyncIterator
@@ -76,4 +76,6 @@ class MailAgent():
         config = self.load_runnable_config()
 
         async for msg, _ in self.graph.astream(input_state, config=config, stream_mode='messages'): #type: ignore
+            if isinstance(msg, ToolMessage):
+                continue
             yield msg.content #type: ignore
