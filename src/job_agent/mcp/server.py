@@ -7,13 +7,16 @@ HOST = "smtp.gmail.com"
 PORT = 587
 
 @mcp.tool()
-async def send_mail(sender: str, subject: str, body: str, recipients: str):
+async def send_mail(sender: str, subject: str, body: str, recipients: list[str]):
     """Send mail from sender to recipients with specified body content"""
     try: 
-        send_email(host=HOST, port=PORT, sender=sender, recipients=recipients, subject=subject, msg=body)
+        send_email(host=HOST, port=PORT, sender=sender, recipients=recipients, subject=subject, body=body)
         return "Mail Send Successfully"
     except Exception as e:
         return f"Issue in sending in mail:\n\n {e}"
+    
+async def read_mail():
+    pass
 
 @mcp.prompt
 async def system_prompt() -> str:

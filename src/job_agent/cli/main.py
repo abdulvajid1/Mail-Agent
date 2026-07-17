@@ -10,8 +10,6 @@ from job_agent.utils import check_user_authentication
 from job_agent.utils import authorize_google_mail
 from job_agent.utils import load_config, save_config
 
-from job_agent.config import CONFIG_PATH
-
 app = typer.Typer(no_args_is_help=True)
 
 async def start_agent_cli():
@@ -37,14 +35,9 @@ def start():
 
 @app.command()
 def setup():
-    """Setup Each components of the MailAgent
-    -- Check Ollama
-    -- Check Ollama models
-    -- Check Mail auth, if not redirect to MailAgent auth gmail"""
+    """Setup Each components of the MailAgent"""
 
-    agent_config = load_config(
-
-    )
+    agent_config = load_config()
     
     #--------Check if ollama is running--------#
     ollama_running = is_ollama_running()
@@ -100,11 +93,10 @@ def setup():
 
     
     # ------------ Do you User need Mailtool enabled --------------
-    if not agent_config['enable_tools']:
+    if not agent_config['enabled_tools']:
         tool_needed = typer.confirm("Do you wanna enable Mail Tool")
-
         if tool_needed:
-            agent_config["enable_tools"] = True
+            agent_config["enabled_tools"].append('send_mail') # TODO: Later need to add tools with cli, now just hardcode
             print("Tool Enabled Successfully")
 
     # Write the fresh config to config file
@@ -119,13 +111,11 @@ def mail_auth():
 
 @app.command()
 def enable_email():
-    """Activate mail tool
-    --  Check if gmail autherized
-    -- setup tool"""
+    """Activate mail tool"""
 
     agent_config = load_config()
     
-    if agent_config['enable_tool']:
+    if agent_config['enable_tools']:
         print("Tool already Enabled")
         typer.Abort()
     

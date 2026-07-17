@@ -24,7 +24,7 @@ def load_config():
     # if there is no config file, create one with defualt value
     if not config_file.exists():
         agent_config = {
-            "enable_tools": False,
+            "enabled_tools": [],
             "mail_authorization": False,
             "model": ""
         }
