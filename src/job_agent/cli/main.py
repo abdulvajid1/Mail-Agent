@@ -1,134 +1,203 @@
-from job_agent import MailAgent
-from job_agent.utils import is_ollama_running
+"""
+Job Agent CLI
+
+A conversational assistant that can (optionally) read/send mail on your
+behalf, backed by a local Ollama model.
+"""
+
+from __future__ import annotations
+
 import asyncio
-import typer
+from typing import Optional
+
 import ollama
-from pathlib import Path
-import json
+import typer
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.prompt import Prompt, Confirm
 
-from job_agent.utils import check_user_authentication
-from job_agent.utils import authorize_google_mail
-from job_agent.utils import load_config, save_config
+from job_agent import MailAgent
+from job_agent.utils import (
+    is_ollama_running,
+    check_user_authentication,
+    authorize_google_mail,
+    load_config,
+    save_config,
+)
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(
+    no_args_is_help=True,
+    add_completion=False,
+    help="Manage and chat with your local mail agent.",
+)
+console = Console()
 
-async def start_agent_cli():
+MAIL_TOOL = "send_mail"
+
+
+# --------------------------------------------------------------------------- #
+# Helpers
+# --------------------------------------------------------------------------- #
+
+def _list_ollama_models() -> list[dict]:
+    """Return installed Ollama models, or exit if there are none / Ollama is down."""
+    if not is_ollama_running():
+        console.print("[red]✗[/red] Ollama isn't running. Start it and try again.")
+        raise typer.Exit(code=1)
+
+    models = ollama.list().get("models", [])
+    if not models:
+        console.print(
+            "[yellow]No models found.[/yellow] Pull one first, e.g. "
+            "[bold]ollama pull llama3[/bold]."
+        )
+        raise typer.Exit(code=1)
+
+    return models
+
+
+def _render_model_table(models: list[dict]) -> None:
+    table = Table(title="Installed Ollama Models")
+    table.add_column("Model", style="cyan")
+    table.add_column("Size (GB)", justify="right")
+
+    for model in models:
+        size_gb = model["size"] / (1024**3)
+        table.add_row(model["model"], f"{size_gb:.2f}")
+
+    console.print(table)
+
+
+def _choose_model(models: list[dict]) -> str:
+    _render_model_table(models)
+    names = [m["model"] for m in models]
+
+    selected = Prompt.ask("Choose a model", choices=names, show_choices=False)
+    return selected
+
+
+def _ensure_google_auth(config: dict) -> None:
+    """Make sure Google mail auth is set up, asking the user if it isn't."""
+    if check_user_authentication():
+        config["mail_authorization"] = True
+        console.print("[green]✓[/green] Google auth already configured.")
+        return
+
+    if not Confirm.ask("Authorize with Google to enable the Gmail tool?"):
+        config["mail_authorization"] = False
+        return
+
+    try:
+        authorize_google_mail()
+    except Exception as exc:  # noqa: BLE001
+        console.print(f"[red]✗[/red] Google authorization failed: {exc}")
+        raise typer.Exit(code=1) from exc
+
+    config["mail_authorization"] = True
+    console.print("[green]✓[/green] Google mail authorized.")
+
+
+# --------------------------------------------------------------------------- #
+# Chat
+# --------------------------------------------------------------------------- #
+
+async def _run_chat_loop() -> None:
     agent = MailAgent()
-    await agent.intialize()
+    with console.status("Starting agent..."):
+        await agent.intialize()
 
-    user_input = input("User: ")
+    console.print(
+        Panel.fit(
+            "Type your message and press enter. Type [bold]exit[/bold] or "
+            "[bold]quit[/bold] to leave.",
+            title="Mail Agent",
+        )
+    )
 
-    while user_input != "exit":
-        print("Assistant: ", end="", flush=True)
+    while True:
+        try:
+            user_input = Prompt.ask("[bold blue]You[/bold blue]")
+        except (KeyboardInterrupt, EOFError):
+            console.print("\n[dim]Session ended.[/dim]")
+            break
 
-        async for msg in agent.stream(user_input=user_input):
-            print(msg, end="", flush=True)
+        if user_input.strip().lower() in {"exit", "quit"}:
+            console.print("[dim]Goodbye![/dim]")
+            break
 
-        user_input = input("\nUser: ")
+        console.print("[bold green]Assistant[/bold green]: ", end="")
+        async for chunk in agent.stream(user_input=user_input):
+            console.print(chunk, end="")
+        console.print()  # newline after the streamed reply
 
 
 @app.command()
-def start():
+def start() -> None:
     """Start an interactive chat session."""
-    asyncio.run(start_agent_cli())
+    asyncio.run(_run_chat_loop())
+
+
+# --------------------------------------------------------------------------- #
+# Setup
+# --------------------------------------------------------------------------- #
+
+@app.command()
+def setup() -> None:
+    """Set up the agent: pick a model, wire up Gmail, and choose tools."""
+    config = load_config()
+
+    console.rule("Ollama")
+    models = _list_ollama_models()
+    config["model"] = _choose_model(models)
+    console.print(f"[green]✓[/green] Using model [bold]{config['model']}[/bold]")
+
+    console.rule("Google Mail")
+    _ensure_google_auth(config)
+
+    console.rule("Tools")
+    enabled_tools = config.setdefault("enabled_tools", [])
+    if MAIL_TOOL not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
+        enabled_tools.append(MAIL_TOOL)
+        console.print("[green]✓[/green] Mail tool enabled.")
+
+    save_config(config)
+    console.rule()
+    console.print("[bold green]Setup complete.[/bold green]")
 
 
 @app.command()
-def setup():
-    """Setup Each components of the MailAgent"""
+def mail_auth() -> None:
+    """Authorize Gmail access if it isn't already set up."""
+    config = load_config()
+    _ensure_google_auth(config)
+    save_config(config)
 
-    agent_config = load_config()
-    
-    #--------Check if ollama is running--------#
-    ollama_running = is_ollama_running()
-    if not ollama_running:
-        print("You should Setup your ollama")
-        raise typer.Abort()
-    else:
-        print("Ollama is Working Fine") 
-    
-    #------Check if there is any model inside ollama----#
-    ollama_models = ollama.list().get('models', [])
-    if ollama_models:
-        print(f"✅ Found {len(ollama_models)} installed model(s):\n")
-    else:
-        print("You don't have any models in your ollama, So download it")
-        raise typer.Abort()
-    
-    #--------Chooose Ollama Model -----------------------------#
-    all_ollama_model_names = [model['model'] for model in ollama_models]
-    for model in ollama_models:
-        # Display the model name and its size in Gigabytes
-        size_gb = model['size'] / (1024 ** 3)
-        print(f"• {model['model']} ({size_gb:.2f} GB)")
-    
-    selected_model = typer.prompt('Choose an ollama model from the list')
-    while selected_model not in all_ollama_model_names:
-        print("The selected model is not in the list, Choose another one..")
-        for model in ollama_models:
-            # Display the model name and its size in Gigabytes
-            size_gb = model['size'] / (1024 ** 3)
-            print(f"• {model['model']} ({size_gb:.2f} GB)")
-        
-        selected_model = typer.prompt("Choose an ollama model from the list")
-
-    agent_config['model'] = selected_model
-
-    # ------ Check if user want to autherize with google ----------# 
-    # check if authentication done else, authenticate
-    user_mail_authenticated =  check_user_authentication() # return cred if already authenticated else None
-    if user_mail_authenticated:
-        agent_config['mail_authorization'] = True
-        print("Google Auth is Good")
-    else:
-        need_to_authorize = typer.confirm("Do you want to authorize with google for enabling gmail tool")
-        if need_to_authorize:
-            try:
-                authorize_google_mail()
-            except Exception as e:
-                print(f"There is something wrong with authorization {e}")
-                raise typer.Abort()
-            
-            print("Successfully authorized google mail")
-
-    
-    # ------------ Do you User need Mailtool enabled --------------
-    if not agent_config['enabled_tools']:
-        tool_needed = typer.confirm("Do you wanna enable Mail Tool")
-        if tool_needed:
-            agent_config["enabled_tools"].append('send_mail') # TODO: Later need to add tools with cli, now just hardcode
-            print("Tool Enabled Successfully")
-
-    # Write the fresh config to config file
-    save_config(agent_config)
-    print("Setup Finished")
 
 @app.command()
-def mail_auth():
-    """Check if already autherized, else autherize the gmail"""
-    authorize_google_mail()
-    typer.Abort()
+def enable_email(
+    disable: bool = typer.Option(False, "--disable", help="Disable the mail tool instead."),
+) -> None:
+    """Enable (or disable) the mail-sending tool."""
+    config = load_config()
+    enabled_tools = config.setdefault("enabled_tools", [])
 
-@app.command()
-def enable_email():
-    """Activate mail tool"""
+    if disable:
+        if MAIL_TOOL in enabled_tools:
+            enabled_tools.remove(MAIL_TOOL)
+            save_config(config)
+            console.print("[green]✓[/green] Mail tool disabled.")
+        else:
+            console.print("[yellow]Mail tool was already disabled.[/yellow]")
+        return
 
-    agent_config = load_config()
-    
-    if agent_config['enable_tools']:
-        print("Tool already Enabled")
-        typer.Abort()
-    
-    agent_config['enable_tool'] = True
+    if MAIL_TOOL in enabled_tools:
+        console.print("[yellow]Mail tool is already enabled.[/yellow]")
+        return
 
-    save_config(agent_config)
-    
-    print("Tool Enabled")
-    typer.Abort()
-
-
-
-    
+    enabled_tools.append(MAIL_TOOL)
+    save_config(config)
+    console.print("[green]✓[/green] Mail tool enabled.")
 
 
 if __name__ == "__main__":
