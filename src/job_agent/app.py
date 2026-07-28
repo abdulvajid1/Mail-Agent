@@ -43,7 +43,9 @@ class MailAgent():
         # if there is messages in graph state values we append new user message
         # else we create new messages for fresh start
         messages = self.graph.get_state(self.config).values.get('messages', None) #type: ignore
-        if messages: 
+        if messages:
+            # truncate to last 4 messages
+            messages = messages[-4:]
             messages.append(HumanMessage(content=user_input))
             return messages
         
