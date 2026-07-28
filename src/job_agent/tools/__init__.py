@@ -1,1 +1,1 @@
-from .mail import send_email, send_dummy_mail
+from .mail import _send_mail, _read_mail

@@ -33,7 +33,7 @@ app = typer.Typer(
 )
 console = Console()
 
-MAIL_TOOL = "send_mail"
+MAIL_TOOLS = ["send_mail","read_mail"]
 
 
 # --------------------------------------------------------------------------- #
@@ -67,14 +67,27 @@ def _render_model_table(models: list[dict]) -> None:
         table.add_row(model["model"], f"{size_gb:.2f}")
 
     console.print(table)
+    
 
+import questionary
 
 def _choose_model(models: list[dict]) -> str:
     _render_model_table(models)
+
     names = [m["model"] for m in models]
 
-    selected = Prompt.ask("Choose a model", choices=names, show_choices=False)
-    return selected
+    return questionary.select(
+        "Choose a model",
+        choices=names,
+    ).ask()
+
+
+# def _choose_model(models: list[dict]) -> str:
+#     _render_model_table(models)
+#     names = [m["model"] for m in models]
+
+#     selected = Prompt.ask("Choose a model", choices=names, show_choices=False)
+#     return selected
 
 
 def _ensure_google_auth(config: dict) -> None:
@@ -153,12 +166,14 @@ def setup() -> None:
     console.print(f"[green]✓[/green] Using model [bold]{config['model']}[/bold]")
 
     console.rule("Google Mail")
+    user_mail = Prompt.ask("Type your Email address, we will use this as default sender mail")
+    config['user_mail'] = user_mail
     _ensure_google_auth(config)
 
     console.rule("Tools")
     enabled_tools = config.setdefault("enabled_tools", [])
-    if MAIL_TOOL not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
-        enabled_tools.append(MAIL_TOOL)
+    if MAIL_TOOLS not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
+        enabled_tools.extend(MAIL_TOOLS)
         console.print("[green]✓[/green] Mail tool enabled.")
 
     save_config(config)
@@ -181,24 +196,45 @@ def enable_email(
     """Enable (or disable) the mail-sending tool."""
     config = load_config()
     enabled_tools = config.setdefault("enabled_tools", [])
+    mail_tools = set(MAIL_TOOLS)
+    enabled_tools = set(enabled_tools)
+
 
     if disable:
-        if MAIL_TOOL in enabled_tools:
-            enabled_tools.remove(MAIL_TOOL)
+        enabled_mail_tools = enabled_tools.intersection(mail_tools)
+        # if any mail tools are inside enabled tools remove it
+        if enabled_mail_tools:
+            for tool in enabled_mail_tools:
+                enabled_tools.remove(tool)
+            
+            config['enaled_tools'] = enabled_tools
             save_config(config)
             console.print("[green]✓[/green] Mail tool disabled.")
         else:
             console.print("[yellow]Mail tool was already disabled.[/yellow]")
         return
 
-    if MAIL_TOOL in enabled_tools:
+    # if there is no tools in mail tools that are not in enabled tools then skip
+    if not mail_tools.difference(enabled_tools):
         console.print("[yellow]Mail tool is already enabled.[/yellow]")
         return
+    
+    enabled_tools = list(enabled_tools)
+    enabled_tools.extend(MAIL_TOOLS)
 
-    enabled_tools.append(MAIL_TOOL)
+    # remove duplicates
+    enabled_tools = list(set(enabled_tools))
+    
+    config['enabled_tools'] = enabled_tools
     save_config(config)
     console.print("[green]✓[/green] Mail tool enabled.")
 
+@app.command()
+def clear_config():
+   """Disable the mail tool instead."""
+   config = {}
+   save_config(config)
+   console.print("[green]✓[/green] Cleared the config.")
 
 if __name__ == "__main__":
     app()

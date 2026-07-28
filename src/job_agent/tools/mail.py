@@ -15,6 +15,7 @@ import email
 from email.header import decode_header
 from email.utils import parsedate_to_datetime
 from email import encoders
+from email.message import Message
 
 from job_agent.utils import authorize_google_mail
 from job_agent.utils import generate_oauth2_string
@@ -27,7 +28,6 @@ def get_attachment_path(attachment_path):
         return None
     
     return attachment_path
-
 
 def _get_attachment_mail_part(attachment_path: Path):
     
@@ -42,19 +42,16 @@ def _get_attachment_mail_part(attachment_path: Path):
     payload.add_header('Content-Decomposition', 'attachment', filename=attachment_path.name)
     return payload
     
-def send_email(
+def _send_mail(
         host: str,
         port: int, 
         subject: str, 
         body: str, 
         sender: str, 
         recipients: list[str],
-        attachment: None | str
+        attachment: str | None
     ):
-    
-
-        
-        
+      
     
     access_token = authorize_google_mail()
     auth_string = generate_oauth2_string(sender, access_token, as_base64=True)
@@ -71,6 +68,7 @@ def send_email(
         if not attachment_path:
             return f"Didn't find attachment in {attachment_path}"
         
+        # retrieve attachment from dir create mail part to attach with main msg
         attachment_payload = _get_attachment_mail_part(attachment_path)
         msg.attach(attachment_payload)
 
@@ -79,7 +77,6 @@ def send_email(
     server.docmd('AUTH', 'XOAUTH2 ' + auth_string)
     server.sendmail(sender, recipients, msg.as_string())
     server.quit()
-
 
 
 
@@ -97,7 +94,7 @@ def _decode_header_value(value: str) -> str:
     return decoded
 
 
-def _get_body(msg: email.message.Message) -> str:
+def _get_body(msg: Message) -> str:
     """Extract plain-text body, falling back to stripped HTML if no plain part exists."""
     if msg.is_multipart():
         # Prefer text/plain; fall back to text/html
@@ -115,18 +112,17 @@ def _get_body(msg: email.message.Message) -> str:
         if raw is None:
             return ""
         charset = msg.get_content_charset() or "utf-8"
-        return raw.decode(charset, errors="replace")
+        return raw.decode(charset, errors="replace") # type: ignore
     else:
         raw = msg.get_payload(decode=True)
         if raw is None:
             return ""
         charset = msg.get_content_charset() or "utf-8"
-        return raw.decode(charset, errors="replace")
+        return raw.decode(charset, errors="replace") # type: ignore
 
 
-def read_mail(
+def _read_mail(
     num_emails: int,
-    sender: str,
     host: str = "imap.gmail.com",
     port: int = 993,
     mailbox: str = "INBOX",
@@ -146,8 +142,9 @@ def read_mail(
         List of dicts: [{"from": ..., "subject": ..., "date": ..., "body": ...}, ...]
         ordered newest-first.
     """
+    user = load_config()['user_mail']
     access_token = authorize_google_mail()
-    auth_string = generate_oauth2_string(sender, access_token, as_base64=False)
+    auth_string = generate_oauth2_string(user, access_token, as_base64=False)
 
     imap = imaplib.IMAP4_SSL(host, port)
     imap.authenticate("XOAUTH2", lambda _: auth_string.encode() if isinstance(auth_string, str) else auth_string)

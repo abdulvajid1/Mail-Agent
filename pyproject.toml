@@ -19,6 +19,8 @@ dependencies = [
     "langgraph>=1.2.7",
     "mcp>=1.28.1",
     "ollama>=0.6.2",
+    "prompt-toolkit>=3.0.52",
+    "questionary>=2.1.1",
     "typer>=0.26.8",
 ]
 
