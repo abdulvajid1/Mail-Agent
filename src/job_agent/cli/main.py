@@ -17,6 +17,8 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
 
+import questionary
+
 from job_agent import MailAgent
 from job_agent.utils import (
     is_ollama_running,
@@ -69,7 +71,6 @@ def _render_model_table(models: list[dict]) -> None:
     console.print(table)
     
 
-import questionary
 
 def _choose_model(models: list[dict]) -> str:
     _render_model_table(models)
@@ -171,10 +172,18 @@ def setup() -> None:
     _ensure_google_auth(config)
 
     console.rule("Tools")
-    enabled_tools = config.setdefault("enabled_tools", [])
+    enabled_tools = config.get("enabled_tools", [])
+    attachment_dir = config.get("attachment_dir", "")
     if MAIL_TOOLS not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
         enabled_tools.extend(MAIL_TOOLS)
         console.print("[green]✓[/green] Mail tool enabled.")
+
+    if not attachment_dir:
+        if Confirm.ask("Setup Attachment Directory?"):
+            attachment_dir = Prompt.ask('Enter your attachment directory path')
+            config['attachment_dir'] = attachment_dir
+            save_config(config)
+            console.print("[green]✓[/green] Setup attachment dir.")
 
     save_config(config)
     console.rule()
