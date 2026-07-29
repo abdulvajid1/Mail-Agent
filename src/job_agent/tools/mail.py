@@ -4,7 +4,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from langchain.tools import tool
+from langsmith import traceable
 
 from job_agent.utils import authorize_google_mail
 from job_agent.utils import generate_oauth2_string
@@ -45,7 +45,8 @@ def _get_attachment_mail_part(attachment_path: Path):
     # add header 
     payload.add_header('Content-Decomposition', 'attachment', filename=attachment_path.name)
     return payload
-    
+
+@traceable    
 def _send_mail(
         host: str,
         port: int, 
@@ -123,7 +124,7 @@ def _get_body(msg: Message) -> str:
         charset = msg.get_content_charset() or "utf-8"
         return raw.decode(charset, errors="replace") # type: ignore
 
-
+@traceable
 def _read_mail(
     num_emails: int,
     host: str = "imap.gmail.com",

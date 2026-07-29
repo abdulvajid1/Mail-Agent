@@ -17,6 +17,7 @@ dependencies = [
     "langchain-mcp-adapters>=0.3.0",
     "langchain-ollama>=1.1.0",
     "langgraph>=1.2.7",
+    "langsmith>=0.9.7",
     "mcp>=1.28.1",
     "ollama>=0.6.2",
     "prompt-toolkit>=3.0.52",

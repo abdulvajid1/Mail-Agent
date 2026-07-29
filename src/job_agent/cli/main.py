@@ -4,8 +4,8 @@ Job Agent CLI
 A conversational assistant that can (optionally) read/send mail on your
 behalf, backed by a local Ollama model.
 """
-
-from __future__ import annotations
+from dotenv import load_dotenv
+load_dotenv()
 
 import asyncio
 from typing import Optional
@@ -176,13 +176,13 @@ def setup() -> None:
     attachment_dir = config.get("attachment_dir", "")
     if MAIL_TOOLS not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
         enabled_tools.extend(MAIL_TOOLS)
+        config['enabled_tools'] = enabled_tools
         console.print("[green]✓[/green] Mail tool enabled.")
 
     if not attachment_dir:
         if Confirm.ask("Setup Attachment Directory?"):
             attachment_dir = Prompt.ask('Enter your attachment directory path')
             config['attachment_dir'] = attachment_dir
-            save_config(config)
             console.print("[green]✓[/green] Setup attachment dir.")
 
     save_config(config)
