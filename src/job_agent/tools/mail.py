@@ -20,6 +20,7 @@ from email.message import Message
 from job_agent.utils import authorize_google_mail
 from job_agent.utils import generate_oauth2_string
 
+from langgraph.config import get_stream_writer
 
 def get_attachment_path(attachment_path) -> Path:
     attachment_dir = load_config()['attachment_dir']
@@ -56,8 +57,8 @@ def _send_mail(
         recipients: list[str],
         attachment: str | None
     ):
-      
-    
+    writer = get_stream_writer()
+    writer(f'Sending Mail from {sender} to {recipients}')
     access_token = authorize_google_mail()
     auth_string = generate_oauth2_string(sender, access_token, as_base64=True)
     

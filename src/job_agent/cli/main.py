@@ -35,23 +35,46 @@ app = typer.Typer(
 )
 console = Console()
 
-MAIL_TOOLS = ["send_mail","read_mail"]
+MAIL_TOOLS = ["send_mail", "read_mail"]
 
 
 # --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
 
+def _print_message(message: str, *, title: str = "Info", style: str = "cyan") -> None:
+    """Render a nicely styled panel for CLI feedback."""
+    console.print(
+        Panel.fit(
+            message,
+            title=f"[bold]{title}[/bold]",
+            border_style=style,
+            padding=(0, 2),
+        )
+    )
+
+
+def _print_success(message: str) -> None:
+    _print_message(message, title="Success", style="green")
+
+
+def _print_warning(message: str) -> None:
+    _print_message(message, title="Warning", style="yellow")
+
+
+def _print_error(message: str) -> None:
+    _print_message(message, title="Error", style="red")
+
 def _list_ollama_models() -> list[dict]:
     """Return installed Ollama models, or exit if there are none / Ollama is down."""
     if not is_ollama_running():
-        console.print("[red]✗[/red] Ollama isn't running. Start it and try again.")
+        _print_error("Ollama isn't running. Start it and try again.")
         raise typer.Exit(code=1)
 
     models = ollama.list().get("models", [])
     if not models:
-        console.print(
-            "[yellow]No models found.[/yellow] Pull one first, e.g. "
+        _print_warning(
+            "No models found. Pull one first, for example: "
             "[bold]ollama pull llama3[/bold]."
         )
         raise typer.Exit(code=1)
@@ -95,7 +118,7 @@ def _ensure_google_auth(config: dict) -> None:
     """Make sure Google mail auth is set up, asking the user if it isn't."""
     if check_user_authentication():
         config["mail_authorization"] = True
-        console.print("[green]✓[/green] Google auth already configured.")
+        _print_success("Google authentication is already configured.")
         return
 
     if not Confirm.ask("Authorize with Google to enable the Gmail tool?"):
@@ -105,11 +128,11 @@ def _ensure_google_auth(config: dict) -> None:
     try:
         authorize_google_mail()
     except Exception as exc:  # noqa: BLE001
-        console.print(f"[red]✗[/red] Google authorization failed: {exc}")
+        _print_error(f"Google authorization failed: {exc}")
         raise typer.Exit(code=1) from exc
 
     config["mail_authorization"] = True
-    console.print("[green]✓[/green] Google mail authorized.")
+    _print_success("Google mail authorization completed successfully.")
 
 
 # --------------------------------------------------------------------------- #
@@ -125,7 +148,8 @@ async def _run_chat_loop() -> None:
         Panel.fit(
             "Type your message and press enter. Type [bold]exit[/bold] or "
             "[bold]quit[/bold] to leave.",
-            title="Mail Agent",
+            title="[bold]Mail Agent[/bold]",
+            border_style="blue",
         )
     )
 
@@ -149,6 +173,13 @@ async def _run_chat_loop() -> None:
 @app.command()
 def start() -> None:
     """Start an interactive chat session."""
+    setup = load_config().get("user_mail")
+    if not setup:
+        _print_error(
+            "Agent setup is incomplete. Run [bold]job-agent setup[/bold] to configure your account first."
+        )
+        raise typer.Exit(code=1)
+
     asyncio.run(_run_chat_loop())
 
 
@@ -164,7 +195,7 @@ def setup() -> None:
     console.rule("Ollama")
     models = _list_ollama_models()
     config["model"] = _choose_model(models)
-    console.print(f"[green]✓[/green] Using model [bold]{config['model']}[/bold]")
+    _print_success(f"Using model [bold]{config['model']}[/bold].")
 
     console.rule("Google Mail")
     user_mail = Prompt.ask("Type your Email address, we will use this as default sender mail")
@@ -177,17 +208,17 @@ def setup() -> None:
     if MAIL_TOOLS not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
         enabled_tools.extend(MAIL_TOOLS)
         config['enabled_tools'] = enabled_tools
-        console.print("[green]✓[/green] Mail tool enabled.")
+        _print_success("Mail tool enabled.")
 
     if not attachment_dir:
         if Confirm.ask("Setup Attachment Directory?"):
             attachment_dir = Prompt.ask('Enter your attachment directory path')
             config['attachment_dir'] = attachment_dir
-            console.print("[green]✓[/green] Setup attachment dir.")
+            _print_success("Attachment directory configured.")
 
     save_config(config)
     console.rule()
-    console.print("[bold green]Setup complete.[/bold green]")
+    _print_success("Setup complete. You can start the agent now.")
 
 
 @app.command()
@@ -218,14 +249,14 @@ def enable_email(
             
             config['enaled_tools'] = enabled_tools
             save_config(config)
-            console.print("[green]✓[/green] Mail tool disabled.")
+            _print_warning("Mail tool disabled.")
         else:
-            console.print("[yellow]Mail tool was already disabled.[/yellow]")
+            _print_warning("Mail tool was already disabled.")
         return
 
     # if there is no tools in mail tools that are not in enabled tools then skip
     if not mail_tools.difference(enabled_tools):
-        console.print("[yellow]Mail tool is already enabled.[/yellow]")
+        _print_warning("Mail tool is already enabled.")
         return
     
     enabled_tools = list(enabled_tools)
@@ -236,14 +267,14 @@ def enable_email(
     
     config['enabled_tools'] = enabled_tools
     save_config(config)
-    console.print("[green]✓[/green] Mail tool enabled.")
+    _print_success("Mail tool enabled.")
 
 @app.command()
 def clear_config():
    """Disable the mail tool instead."""
    config = {}
    save_config(config)
-   console.print("[green]✓[/green] Cleared the config.")
+   _print_warning("Configuration cleared.")
 
 if __name__ == "__main__":
     app()

@@ -26,7 +26,8 @@ def load_config():
         agent_config = {
             "enabled_tools": [],
             "mail_authorization": False,
-            "model": ""
+            "model": None,
+            "user_mail": None
         }
 
         with open(config_file, 'w') as f:
