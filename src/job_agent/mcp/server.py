@@ -10,7 +10,7 @@ PORT = 587
 
 @mcp.tool()
 async def send_mail(sender: str, subject: str, body: str, recipients: list[str], attachment: str | None):
-    """Send mail from sender to recipients with specified body content and attachment"""
+    """Send mail from sender to recipients with specified body content. Use attachment if only user specified it's path else leave it empty"""
     try: 
         _send_mail(host=HOST, 
                    port=PORT, 

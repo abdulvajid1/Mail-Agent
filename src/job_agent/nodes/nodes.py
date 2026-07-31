@@ -3,6 +3,8 @@ from langchain_ollama import ChatOllama
 from langchain_core.runnables import RunnableConfig
 from langchain.messages import ToolMessage
 
+from langgraph.config import get_stream_writer
+
 from uuid import uuid4
 
 def chat_node(state: AgentState, config: RunnableConfig):
@@ -20,6 +22,8 @@ def tool_condition(state: AgentState, config: RunnableConfig):
         return False
     
 async def tool_node(state: AgentState, config: RunnableConfig):
+
+    writer = get_stream_writer()
     tool_calls = state["messages"][-1].tool_calls # type: ignore , [{'name': 'send_mail', 'args': {'to':
     tool_registory = config['configurable']['tools'] # type: ignore {"tool_name": tool}
     tool_messages = []
@@ -27,6 +31,7 @@ async def tool_node(state: AgentState, config: RunnableConfig):
         tool_name = tool['name']
         tool_args = tool['args']
         runnable_tool = tool_registory[tool_name]
+        writer(f'\nExecuting {tool_name} tool......')
         tool_output = await runnable_tool.ainvoke(tool_args)
         tool_messages.append(ToolMessage(content=tool_output, tool_call_id=uuid4()))
 

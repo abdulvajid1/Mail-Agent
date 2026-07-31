@@ -166,7 +166,13 @@ async def _run_chat_loop() -> None:
 
         console.print("[bold green]Assistant[/bold green]: ", end="")
         async for chunk in agent.stream(user_input=user_input):
-            console.print(chunk, end="")
+
+            if isinstance(chunk, tuple):
+                for ch in chunk[1]:
+                    console.print(f"[dim]{ch}[/dim]", end="")
+                console.print()
+            else:
+                console.print(chunk, end="")
         console.print()  # newline after the streamed reply
 
 

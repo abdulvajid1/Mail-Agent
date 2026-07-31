@@ -77,7 +77,18 @@ class MailAgent():
         input_state = {"messages": messages}
         config = self.load_runnable_config()
 
-        async for msg, _ in self.graph.astream(input_state, config=config, stream_mode='messages'): #type: ignore
-            if isinstance(msg, ToolMessage):
+        # async for type, msg in self.graph.astream(input_state, config=config, stream_mode='messages'): #type: ignore
+        #     # Skip tool message in ui
+        #     if isinstance(msg, ToolMessage):
+        #         continue
+        #     yield msg.content #type: ignore
+
+        async for type, msg in self.graph.astream(input_state, config=config, stream_mode=['messages', 'custom']): #type: ignore
+            # Skip tool message in ui
+            if isinstance(msg[0], ToolMessage): # ( type, (BaseMessage, langgraph metadata))
                 continue
-            yield msg.content #type: ignore
+
+            if type == "custom":
+                yield ('custom', msg)
+            else:
+                yield msg[0].content #type: ignore

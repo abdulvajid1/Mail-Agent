@@ -1,7 +1,7 @@
 from job_agent.agent import build_graph
 from job_agent.model import load_model
 from job_agent.prompts import SYSTEM_PROMPT
-from job_agent.tools import send_dummy_mail
+from job_agent.tools import _send_mail
 from langchain.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 
