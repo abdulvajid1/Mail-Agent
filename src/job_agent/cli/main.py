@@ -164,15 +164,31 @@ async def _run_chat_loop() -> None:
             console.print("[dim]Goodbye![/dim]")
             break
 
-        console.print("[bold green]Assistant[/bold green]: ", end="")
-        async for chunk in agent.stream(user_input=user_input):
+        # console.print("[bold green]Assistant[/bold green]: ", end="")
 
-            if isinstance(chunk, tuple):
-                for ch in chunk[1]:
-                    console.print(f"[dim]{ch}[/dim]", end="")
-                console.print()
-            else:
-                console.print(chunk, end="")
+        status = None
+        async for event in agent.stream(user_input=user_input):
+
+            if event['type'] == "status": # Status reminders, "tool {name} Executing...."
+
+                # For terminal spinner effect
+                if status == None:
+                    status = console.status(event["data"])
+                    status.start()
+                
+                else:
+                    status.update(event["data"])
+
+                # console.print()
+            elif event['type'] == "token":
+                # stop the spinner when ai start generating, means tool execution complete
+                if status:
+                    status.stop()
+                    status = None
+                    console.print("[bold green]Assistant[/bold green]: ", end="")
+                    
+                    
+                console.print(event['data'], end="")
         console.print()  # newline after the streamed reply
 
 

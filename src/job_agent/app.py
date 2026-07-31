@@ -72,7 +72,7 @@ class MailAgent():
         return config
         
 
-    async def stream(self, user_input: str) -> AsyncIterator[str]:
+    async def stream(self, user_input: str) -> AsyncIterator[dict[str, Any]]:
         messages = self.build_message(user_input=user_input)
         input_state = {"messages": messages}
         config = self.load_runnable_config()
@@ -89,6 +89,6 @@ class MailAgent():
                 continue
 
             if type == "custom":
-                yield ('custom', msg)
+                yield {"type":"status", "data": msg}
             else:
-                yield msg[0].content #type: ignore
+                yield {"type":"token", "data": msg[0].content} #type: ignore

@@ -31,7 +31,7 @@ async def tool_node(state: AgentState, config: RunnableConfig):
         tool_name = tool['name']
         tool_args = tool['args']
         runnable_tool = tool_registory[tool_name]
-        writer(f'\nExecuting {tool_name} tool......')
+        writer(f'Executing {tool_name} tool......')
         tool_output = await runnable_tool.ainvoke(tool_args)
         tool_messages.append(ToolMessage(content=tool_output, tool_call_id=uuid4()))
 
