@@ -77,11 +77,19 @@ uv tool upgrade mail-agent
 
 ## Uninstall
 
+Remove everything (the tool, its config, and your Gmail credentials) with one command:
+
+**macOS / Linux:**
 ```bash
-uv tool uninstall mail-agent
+curl -fsSL https://raw.githubusercontent.com/abdulvajid1/Mail-Agent/master/uninstall.sh | bash
 ```
 
-This removes the isolated environment and the `mail-agent` command completely — nothing is left behind on your system.
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/abdulvajid1/Mail-Agent/master/uninstall.ps1 | iex
+```
+
+This uninstalls the `mail-agent` tool, deletes `~/.agent/config.json`, your OAuth `token.json`, and — if you run it interactively — offers to remove `uv` too. The script asks before touching anything outside of mail-agent's own files.
 
 ## Development
 
