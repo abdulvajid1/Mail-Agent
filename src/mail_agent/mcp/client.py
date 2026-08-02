@@ -5,18 +5,16 @@ from mail_agent.config import MCP_SERVER_PATH
 
 from langchain_mcp_adapters.client import MultiServerMCPClient 
 
-
+import sys
 
 def connect_to_mcp():
     client = MultiServerMCPClient({
-            "gmail": {
-                "transport": "stdio",  # Local subprocess communication
-                "command": "python",
-                # Absolute path to your math_server.py file
-                "args": [MCP_SERVER_PATH.as_posix()],
-            }
-        }) # type: ignore
-    
+        "gmail": {
+            "transport": "stdio",
+            "command": sys.executable,   # the exact interpreter currently running this code
+            "args": [str(MCP_SERVER_PATH)],
+        }
+    })
     return client
 
 
