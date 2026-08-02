@@ -1,9 +1,15 @@
 from fastmcp import FastMCP
 from job_agent.tools import _send_mail, _read_mail
 from job_agent.utils import load_config
+import logging
+logging.basicConfig(level=logging.ERROR)
+# or, more targeted:
+logging.getLogger("mcp").setLevel(logging.ERROR)
+logging.getLogger("fastmcp").setLevel(logging.ERROR)
+logging.getLogger("mcp.server").setLevel(logging.ERROR)
 
 mcp = FastMCP('gmail',
-              client_log_level='error')
+              client_log_level='error', )
 
 HOST = "smtp.gmail.com"
 PORT = 587
@@ -52,7 +58,7 @@ Never invent email addresses or send emails with missing required information.
     
 
 def main():
-    mcp.run(transport="stdio")
+    mcp.run(transport="stdio", show_banner=False)
 
 if __name__ == "__main__":
     main()

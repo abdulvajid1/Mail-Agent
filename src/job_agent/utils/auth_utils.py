@@ -6,11 +6,11 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.errors import HttpError
+from job_agent.config import CREDENTIALS
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://mail.google.com/']
 USER_TOKENS = 'token.json'
-CREDENTIALS = 'credentials.json'
 
 def authorize_google_mail() -> str: # type: ignore
     """ Gets a valid Google access token with the mail scope permissions. """
@@ -24,7 +24,7 @@ def authorize_google_mail() -> str: # type: ignore
             creds.refresh(Request())
         else:
             print("Authenticating for first time")
-            flow = InstalledAppFlow.from_client_secrets_file(
+            flow = InstalledAppFlow.from_client_config(
                 CREDENTIALS, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
