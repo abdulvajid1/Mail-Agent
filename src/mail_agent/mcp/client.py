@@ -1,7 +1,7 @@
 from fastmcp import Client
 from fastmcp.exceptions import FastMCPError
 import asyncio
-from job_agent.config import MCP_SERVER_PATH
+from mail_agent.config import MCP_SERVER_PATH
 
 from langchain_mcp_adapters.client import MultiServerMCPClient 
 

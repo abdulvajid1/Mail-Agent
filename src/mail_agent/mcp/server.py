@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
-from job_agent.tools import _send_mail, _read_mail
-from job_agent.utils import load_config
+from mail_agent.tools import _send_mail, _read_mail
+from mail_agent.utils import load_config
 import logging
 logging.basicConfig(level=logging.ERROR)
 # or, more targeted:

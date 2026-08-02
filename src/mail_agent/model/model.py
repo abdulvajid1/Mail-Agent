@@ -1,5 +1,5 @@
 from langchain_ollama import ChatOllama
-from job_agent.utils import load_config
+from mail_agent.utils import load_config
 
 
 def load_model(model_name: None|str = None):

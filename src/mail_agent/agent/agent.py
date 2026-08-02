@@ -1,7 +1,7 @@
-from job_agent.nodes import chat_node
-from job_agent.nodes import tool_condition
-from job_agent.nodes import tool_node
-from job_agent.states import AgentState
+from mail_agent.nodes import chat_node
+from mail_agent.nodes import tool_condition
+from mail_agent.nodes import tool_node
+from mail_agent.states import AgentState
 
 from langgraph.graph import StateGraph
 from langgraph.graph import START, END

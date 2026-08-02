@@ -6,9 +6,9 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from langsmith import traceable
 
-from job_agent.utils import authorize_google_mail
-from job_agent.utils import generate_oauth2_string
-from job_agent.utils import load_config, save_config
+from mail_agent.utils import authorize_google_mail
+from mail_agent.utils import generate_oauth2_string
+from mail_agent.utils import load_config, save_config
 
 import imaplib
 import email
@@ -17,8 +17,8 @@ from email.utils import parsedate_to_datetime
 from email import encoders
 from email.message import Message
 
-from job_agent.utils import authorize_google_mail
-from job_agent.utils import generate_oauth2_string
+from mail_agent.utils import authorize_google_mail
+from mail_agent.utils import generate_oauth2_string
 
 def get_attachment_path(attachment_path) -> Path:
     attachment_dir = load_config()['attachment_dir']

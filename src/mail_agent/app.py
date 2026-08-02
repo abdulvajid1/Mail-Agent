@@ -1,9 +1,9 @@
 from typing import Any, List
 
-from job_agent.agent import build_graph
-from job_agent.model import load_model
-from job_agent.mcp import connect_to_mcp
-from job_agent.utils import load_config
+from mail_agent.agent import build_graph
+from mail_agent.model import load_model
+from mail_agent.mcp import connect_to_mcp
+from mail_agent.utils import load_config
 
 from langchain.messages import HumanMessage, SystemMessage, AnyMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig

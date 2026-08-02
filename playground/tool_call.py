@@ -1,11 +1,11 @@
-from job_agent.agent import build_graph
-from job_agent.model import load_model
-from job_agent.prompts import SYSTEM_PROMPT
-from job_agent.tools import _send_mail
+from mail_agent.agent import build_graph
+from mail_agent.model import load_model
+from mail_agent.prompts import SYSTEM_PROMPT
+from mail_agent.tools import _send_mail
 from langchain.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 
-from job_agent.mcp import connect_to_mcp
+from mail_agent.mcp import connect_to_mcp
 
 import asyncio
 

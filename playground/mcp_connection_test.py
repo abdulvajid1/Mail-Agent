@@ -1,4 +1,4 @@
-from job_agent.mcp import connect_to_mcp
+from mail_agent.mcp import connect_to_mcp
 import asyncio
 
 async def main():

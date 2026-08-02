@@ -19,8 +19,8 @@ from rich.prompt import Prompt, Confirm
 
 import questionary
 
-from job_agent import MailAgent
-from job_agent.utils import (
+from mail_agent import MailAgent
+from mail_agent.utils import (
     is_ollama_running,
     check_user_authentication,
     authorize_google_mail,

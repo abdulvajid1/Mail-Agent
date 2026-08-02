@@ -3,7 +3,7 @@ import urllib.error
 from pathlib import Path
 import json
 
-from job_agent.config import CONFIG_PATH
+from mail_agent.config import CONFIG_PATH
 
 def is_ollama_running(url="http://localhost:11434"):
     try:

@@ -1,4 +1,4 @@
-from job_agent.states import AgentState
+from mail_agent.states import AgentState
 from langchain_ollama import ChatOllama
 from langchain_core.runnables import RunnableConfig
 from langchain.messages import ToolMessage
