@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 
 $Repo = "abdulvajid1/Mail-Agent"
 
-Write-Host "Installing job-agent..." -ForegroundColor Cyan
+Write-Host "Installing mail-agent..." -ForegroundColor Cyan
 
 # 1. Ensure uv is installed
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
@@ -29,4 +29,4 @@ uv tool install "git+https://github.com/$Repo.git"
 # 4. Make sure the install dir is actually on PATH
 uv tool update-shell
 
-Write-Host "✅ Installed! Close and reopen your terminal, then run: job-agent" -ForegroundColor Green
+Write-Host "✅ Installed! Close and reopen your terminal, then run: mail-agent" -ForegroundColor Green

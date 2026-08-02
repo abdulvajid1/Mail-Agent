@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO="abdulvajid1/Mail-Agent"
 
-echo "Installing job-agent..."
+echo "Installing mail-agent..."
 
 # 1. Ensure uv is installed
 if ! command -v uv &> /dev/null; then
@@ -22,4 +22,4 @@ uv tool install "git+https://github.com/${REPO}.git"
 # 3. Make sure the install dir is actually on PATH
 uv tool update-shell
 
-echo "✅ Installed! Restart your terminal, then run: job-agent"
+echo "✅ Installed! Restart your terminal, then run: mail-agent"
