@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 $ErrorActionPreference = "Stop"
 
-$Repo = "yourusername/job-mail-agent"
+$Repo = "https://github.com/abdulvajid1/Mail-Agent"
 
 Write-Host "Installing job-agent..." -ForegroundColor Cyan
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="yourusername/job-mail-agent"
+REPO="https://github.com/abdulvajid1/Mail-Agent"
 
 echo "Installing job-agent..."
 
