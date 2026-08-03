@@ -7,17 +7,27 @@ say() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 ok()  { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 
 # --------------------------------------------------------------------------- #
-# 1. Remove the mail-agent tool
+# 1. Remove the mail-agent tool (only mail-agent, never other uv tools)
 # --------------------------------------------------------------------------- #
 if command -v uv >/dev/null 2>&1 && uv tool list 2>/dev/null | grep -q "^mail-agent"; then
     say "Uninstalling mail-agent tool..."
     uv tool uninstall mail-agent
 else
-    # uv is gone or the tool isn't registered — remove the shim directly
+    # uv is gone or the tool isn't registered — remove the shim + tool dir directly
     for bin in "$HOME/.local/bin/mail-agent" "$HOME/.cargo/bin/mail-agent"; do
         if [ -e "$bin" ]; then
             say "Removing $bin"
             rm -f "$bin"
+        fi
+    done
+    for dir in \
+        "$HOME/.local/share/uv/tools/mail-agent" \
+        "$HOME/.cargo/uv/tools/mail-agent" \
+        "${XDG_DATA_HOME:-$HOME/.local/share}/uv/tools/mail-agent"
+    do
+        if [ -d "$dir" ]; then
+            say "Removing $dir"
+            rm -rf "$dir"
         fi
     done
 fi
@@ -39,18 +49,20 @@ do
 done
 
 # --------------------------------------------------------------------------- #
-# 3. Optionally remove uv too (only the installer installs it automatically)
+# 3. Optionally remove uv itself (binaries + cache only; other tools/projects
+#    and uv-managed Pythons are left untouched)
 # --------------------------------------------------------------------------- #
 if command -v uv >/dev/null 2>&1; then
     if [ -t 0 ]; then
-        printf 'Remove uv as well? The installer may have installed it. [y/N] '
+        printf 'Remove uv itself? This deletes the uv binaries and its download cache, '
+        printf 'but leaves every other tool and project on your machine. [y/N] '
         read -r answer
         case "$answer" in
             y|Y|yes|Yes)
-                say "Removing uv..."
+                say "Removing uv binaries and cache..."
                 rm -f "$HOME/.local/bin/uv" "$HOME/.local/bin/uvx" \
                       "$HOME/.cargo/bin/uv" "$HOME/.cargo/bin/uvx"
-                rm -rf "$HOME/.local/share/uv" "$HOME/.cache/uv"
+                rm -rf "$HOME/.cache/uv" "${XDG_CACHE_HOME:-$HOME/.cache}/uv"
                 ;;
             *)
                 ok "Keeping uv installed."

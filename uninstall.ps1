@@ -3,7 +3,7 @@
 #Requires -Version 5.1
 $ErrorActionPreference = "Stop"
 
-# 1. Remove the mail-agent tool
+# 1. Remove the mail-agent tool (only mail-agent, never other uv tools)
 $installed = if (Get-Command uv -ErrorAction SilentlyContinue) { uv tool list 2>$null | Select-String "^mail-agent" } else { $null }
 if ($installed) {
     Write-Host "Uninstalling mail-agent tool..." -ForegroundColor Cyan
@@ -14,6 +14,18 @@ else {
     if (Test-Path $shim) {
         Write-Host "Removing $shim" -ForegroundColor Cyan
         Remove-Item -Force $shim
+    }
+    # Remove mail-agent's own tool dir only (leave every other uv tool alone)
+    $toolDirs = @(
+        (Join-Path $HOME ".local\share\uv\tools\mail-agent"),
+        (Join-Path $env:APPDATA "uv\data\tools\mail-agent"),
+        (Join-Path $HOME "AppData\Roaming\uv\data\tools\mail-agent")
+    )
+    foreach ($dir in $toolDirs) {
+        if (Test-Path $dir) {
+            Write-Host "Removing $dir" -ForegroundColor Cyan
+            Remove-Item -Recurse -Force $dir
+        }
     }
 }
 
@@ -32,12 +44,14 @@ foreach ($path in $targets) {
     }
 }
 
-# 3. Optionally remove uv too
+# 3. Optionally remove uv itself (binaries + cache only; other tools/projects
+#    and uv-managed Pythons are left untouched)
 if (Get-Command uv -ErrorAction SilentlyContinue) {
-    $ans = Read-Host "Remove uv as well? The installer may have installed it. (y/N)"
+    $ans = Read-Host "Remove uv itself? This deletes the uv binaries and its download cache, but leaves every other tool and project on your machine. (y/N)"
     if ($ans -match "^(y|yes)$") {
-        Write-Host "Removing uv..." -ForegroundColor Cyan
-        Remove-Item -Recurse -Force "$HOME\.local\bin\uv.exe", "$HOME\.local\bin\uvx.exe", "$env:APPDATA\uv", "$env:LOCALAPPDATA\uv" -ErrorAction SilentlyContinue
+        Write-Host "Removing uv binaries and cache..." -ForegroundColor Cyan
+        Remove-Item -Force "$HOME\.local\bin\uv.exe", "$HOME\.local\bin\uvx.exe" -ErrorAction SilentlyContinue
+        Remove-Item -Recurse -Force "$env:LOCALAPPDATA\uv\cache" -ErrorAction SilentlyContinue
     }
     else {
         Write-Host "Keeping uv installed." -ForegroundColor Yellow
