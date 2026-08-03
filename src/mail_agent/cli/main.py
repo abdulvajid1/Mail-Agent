@@ -167,6 +167,7 @@ async def _run_chat_loop() -> None:
         # console.print("[bold green]Assistant[/bold green]: ", end="")
 
         status = None
+        assistent_started = False
         async for event in agent.stream(user_input=user_input):
 
             if event['type'] == "status": # Status reminders, "tool {name} Executing...."
@@ -181,6 +182,14 @@ async def _run_chat_loop() -> None:
 
                 # console.print()
             elif event['type'] == "token":
+
+                # a fix for assitent text coming and erased my spinner of tool executing status,
+                #  so only asistent msg will show assisten msg not for tool spinner
+                # when tool executing, first few token will "", so condition on ""
+                if not assistent_started and event["data"] != "":
+                    assistent_started = True
+                    console.print("[bold green]Assistant[/bold green]: ", end="")
+                
                 # stop the spinner when ai start generating, means tool execution complete
                 if status:
                     status.stop()
