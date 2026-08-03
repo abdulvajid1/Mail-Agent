@@ -205,12 +205,18 @@ async def _run_chat_loop() -> None:
 def start() -> None:
     """Start an interactive chat session."""
     setup = load_config().get("user_mail")
+
+    
     if not setup:
         _print_error(
             "Agent setup is incomplete. Run [bold]job-agent setup[/bold] to configure your account first."
         )
         raise typer.Exit(code=1)
 
+    if not is_ollama_running():
+        _print_error("Ollama isn't running. Start it and try again.")
+        raise typer.Exit(code=1)
+    
     asyncio.run(_run_chat_loop())
 
 
