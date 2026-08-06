@@ -83,12 +83,12 @@ class MailAgent():
         #         continue
         #     yield msg.content #type: ignore
 
-        async for type, msg in self.graph.astream(input_state, config=config, stream_mode=['messages', 'custom']): #type: ignore
+        async for msg_type, msg in self.graph.astream(input_state, config=config, stream_mode=['messages', 'custom']): #type: ignore
             # Skip tool message in ui
             if isinstance(msg[0], ToolMessage): # ( type, (BaseMessage, langgraph metadata))
                 continue
 
-            if type == "custom":
+            if msg_type == "custom":
                 yield {"type":"status", "data": msg}
             else:
                 yield {"type":"token", "data": msg[0].content} #type: ignore
