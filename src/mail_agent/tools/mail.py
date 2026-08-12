@@ -20,15 +20,15 @@ from email.message import Message
 from mail_agent.utils import authorize_google_mail
 from mail_agent.utils import generate_oauth2_string
 
-def get_attachment_path(attachment_path) -> Path:
+def get_attachment_path(attachment_path):
     attachment_dir = load_config()['attachment_dir']
 
     if not attachment_dir:
-        return "User didn't setup attachment dir, Setup using job-agent setup" # type: ignore
+        return "User didn't setup attachment dir, Setup using job-agent setup" # type: igno
     
     attachment_path = Path(attachment_dir) / attachment_path
     if not attachment_path.exists():
-        return f"Attachment path {attachment_path} does not exit" # type: ignore
+        return f"Attachment path {attachment_path} does not exit, make sure the user have the {attachment_path} in {attachment_dir}" # type: ignore
     
     return attachment_path
 

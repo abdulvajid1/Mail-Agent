@@ -69,6 +69,33 @@ mail-agent start
 | `mail-agent clear-config` | Reset/disable the mail tool |
 | `mail-agent --help` | Show all available commands |
 
+## Web UI
+
+A minimalist React frontend that talks to the agent through a FastAPI server
+over Server-Sent Events (SSE). Tool executions are surfaced in real time as
+status events while the assistant streams its reply.
+
+**Start the API** (from the repo root, requires a configured `~/.agent/config.json` — run `mail-agent setup` first):
+
+```bash
+uv run python -m mail_agent.api
+```
+
+The API runs on `http://localhost:8000`:
+- `GET /config` — agent/setup status, model, enabled tools, Ollama status
+- `GET /chat?user_input=...` or `POST /chat` — SSE stream of `{type, data}` events (`status`, `token`, `done`, `error`)
+
+**Start the frontend** (in a second terminal):
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. The Vite dev server proxies `/api/*` to the
+FastAPI backend, so no CORS setup is needed locally.
+
 ## Updating
 
 ```bash

@@ -35,6 +35,10 @@ MANIFEST
 token.json
 credentials.json
 
+# Frontend
+web/node_modules/
+web/dist/
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

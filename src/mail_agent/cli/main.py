@@ -235,7 +235,12 @@ def setup() -> None:
     _print_success(f"Using model [bold]{config['model']}[/bold].")
 
     console.rule("Google Mail")
-    user_mail = Prompt.ask("Type your Email address, we will use this as default sender mail")
+    user_mail = config.get('user_mail', "")
+    if config['user_mail']:
+        if Confirm.ask("You already setup a mail, Do you want to change it"):
+            user_mail = Prompt.ask("Type your Email address, we will use this as default sender mail")
+    else:
+        user_mail = Prompt.ask("Type your Email address, we will use this as default sender mail")
     config['user_mail'] = user_mail
     _ensure_google_auth(config)
 
@@ -244,6 +249,7 @@ def setup() -> None:
     attachment_dir = config.get("attachment_dir", "")
     if MAIL_TOOLS not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
         enabled_tools.extend(MAIL_TOOLS)
+        enabled_tools = list(set(enabled_tools)) # remove duplicates
         config['enabled_tools'] = enabled_tools
         _print_success("Mail tool enabled.")
 

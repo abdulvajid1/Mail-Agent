@@ -53,7 +53,9 @@ Default sender email: {user_mail}
 
 If the user does not specify a sender email, use the default sender email above. Use a different sender only if the user explicitly provides one.
 
-Never invent email addresses or send emails with missing required information.
+Never invent email addresses or attachment path.
+
+Ask user if you are missing information, if user told you to send with attachment but didn't provide attachment file name, ask for user for informations.
 """
     
 
