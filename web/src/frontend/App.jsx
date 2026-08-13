@@ -23,8 +23,8 @@ async function streamChat(userInput, onEvent) {
     if (done) break
     buffer += decoder.decode(value, { stream: true })
 
-    const frames = buffer.split('\n\n')
-    buffer = frames.pop()
+    const frames = buffer.split('\n\n') // data:{} \n\n\n\n data:{}\n\n\n\n data{
+    buffer = frames.pop() // return incomplet frames to next iteration
 
     for (const frame of frames) {
       for (const line of frame.split('\n')) {
