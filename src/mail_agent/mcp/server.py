@@ -15,18 +15,57 @@ HOST = "smtp.gmail.com"
 PORT = 587
 
 @mcp.tool()
-async def send_mail(sender: str, subject: str, body: str, recipients: list[str], attachment: str | None):
-    """Send mail from sender to recipients with specified body content. Use attachment if only user specified it's path else leave it empty"""
+async def send_mail(sender: str, 
+                    subject: str, 
+                    recipients: list[str], 
+                    body: str,  
+                    attachment: str, 
+                    is_draft: bool
+                ):
+
+    """ 
+    Send or draft an email.
+
+    Use this tool whenever the user wants to send an email, compose an email,
+    draft an email, reply to an email, or send a message to one or more recipients.
+
+    Parameters:
+    - sender: Email address of the authenticated account sending the email.
+    - subject: Subject line of the email.
+    - recipients: List of recipient email addresses.
+    - body: Complete email body content. Generate a professional and well-formatted
+      message when the user provides instructions rather than the final text.
+    - attachment: File path of an attachment only when the user explicitly requests
+      attaching a file or provides a file path. Otherwise use "" (empty string).
+    - is_draft:
+        * True  -> Save the email as a draft without sending it.
+        * False -> Send the email immediately.
+
+    Guidelines:
+    - Use is_draft=True when the user says things such as:
+      "draft an email", "create a draft", "prepare an email", "save as draft",
+      or when they ask to review the email before sending.
+
+    - Use is_draft=False when the user clearly wants the email delivered,
+      such as:
+      "send an email", "email them", "notify them", "send this message".
+
+    - Do not invent recipient addresses.
+    - Do not invent attachments.
+    """
+   
     try: 
-        _send_mail(host=HOST, 
-                   port=PORT, 
-                   sender=sender, 
+        _send_mail(sender=sender, 
                    recipients=recipients, 
                    subject=subject, 
                    body=body, 
-                   attachment=attachment)
+                   attachment=attachment,
+                   is_draft=is_draft)
         
-        return "Mail Send Successfully"
+        if is_draft:
+            return "Mail Drafted Successfully"
+        else:
+            return "Mail Send Successfully"
     except Exception as e:
         return f"Issue in sending in mail:\n\n {e}"
  
