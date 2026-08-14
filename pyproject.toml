@@ -23,6 +23,7 @@ dependencies = [
     "ollama>=0.6.2",
     "prompt-toolkit>=3.0.52",
     "questionary>=2.1.1",
+    "textual-dev>=1.8.0",
     "typer>=0.26.8",
 ]
 

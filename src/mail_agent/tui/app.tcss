@@ -1,0 +1,19 @@
+#input_box {
+    background: $boost;
+    height: auto;
+    dock: bottom;
+    margin: 1;
+    padding: 1;
+}
+
+#prompt_icon {
+    width: 3;
+    content-align: center middle;
+    margin: 1;
+}
+
+#prompt_input {
+    background: transparent;
+    width: 95%;
+    height: auto;
+}
