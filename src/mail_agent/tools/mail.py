@@ -17,9 +17,6 @@ from email.utils import parsedate_to_datetime
 from email import encoders
 from email.message import Message
 
-from mail_agent.utils import authorize_google_mail
-from mail_agent.utils import generate_oauth2_string
-
 import time
 
 def _get_attachment_path(attachment_path):
@@ -156,56 +153,11 @@ def _get_body(msg: Message) -> str:
 @traceable
 def _read_mail(
     num_emails: int,
-    host: str = "imap.gmail.com",
-    port: int = 993,
-    mailbox: str = "INBOX",
+    mailbox: str,
 ) -> list[dict]:
-    """
-    Read recent emails from a mailbox and return them in a structured format.
 
-    Use this tool whenever the user wants to:
-    - Read emails.
-    - Check their inbox.
-    - View recent emails.
-    - See unread or latest messages.
-    - Review received emails.
-    - Find information contained in recent emails.
-    - Summarize recent emails.
-    - Check whether someone has replied.
-
-    Parameters:
-    - num_emails:
-        Number of most recent emails to retrieve.
-        Choose a reasonable value based on the user's request:
-        * "latest email" -> 1
-        * "last 3 emails" -> 3
-        * "recent emails" -> 5
-        * "check my inbox" -> 5
-
-    - mailbox:
-        Mail folder to read from.
-        Common values:
-        * "INBOX" -> received emails
-        * "[Gmail]/Sent Mail" -> sent emails
-        * "[Gmail]/Drafts" -> drafts
-        * "[Gmail]/Trash" -> deleted emails
-
-    Returns:
-    A list of emails containing:
-    - sender
-    - subject
-    - date
-    - body
-
-    Guidelines:
-    - Use this tool before answering questions about the user's emails.
-    - Use this tool before claiming whether an email exists or does not exist.
-    - When the user asks about a specific email, retrieve enough recent emails to locate it.
-    - Prefer reading a small number of emails first instead of retrieving large volumes unnecessarily.
-    - Do not use this tool to send, reply to, draft, or delete emails.
-    - If the user asks to summarize their inbox, read recent emails first and then provide a concise summary.
-    - If the user asks whether someone replied, check recent inbox emails before answering.
-    """
+    host = "imap.gmail.com"
+    port = 993
     user = load_config()['user_mail']
     access_token = authorize_google_mail()
     auth_string = generate_oauth2_string(user, access_token, as_base64=False)
