@@ -12,7 +12,7 @@ class MailAgent(App):
 
     def compose(self):
         yield Header(show_clock=True)
-        with Horizontal(id="input_box"):
+        with Horizontal(id="input_container"):
             yield Static(">", id="prompt_icon")
             yield Input(
                 placeholder="Ask me any Mail related questions",

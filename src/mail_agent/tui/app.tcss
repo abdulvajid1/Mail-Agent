@@ -1,19 +1,25 @@
-#input_box {
+
+#input_container {
     background: $boost;
-    height: auto;
     dock: bottom;
-    margin: 1;
-    padding: 1;
+    height: auto;
+    margin:0 0 2 0; 
 }
 
 #prompt_icon {
-    width: 3;
-    content-align: center middle;
-    margin: 1;
+    width: 2;
+    content-align: right middle;
+    margin:1 0 0 0;
 }
 
 #prompt_input {
-    background: transparent;
+    border: transparent;
     width: 95%;
-    height: auto;
+    background: transparent;
+    
+}
+
+Input {
+    border: none;
+    margin: 0;
 }
