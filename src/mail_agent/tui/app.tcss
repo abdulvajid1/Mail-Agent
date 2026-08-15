@@ -1,25 +1,317 @@
+/* ------------------------------------------------------- *
+ *  Mail Agent — design tokens (warm dark, Claude-inspired)
+ * ------------------------------------------------------- */
+$bg: #161615;
+$surface: #1f1e1d;
+$surface-2: #282724;
+$surface-3: #302f2c;
+$border: #3b3a37;
+$border-soft: #2b2a27;
+$text: #e8e6e3;
+$muted: #a5a39d;
+$faint: #6d6b65;
+$accent: #d97757;
+$accent-hi: #e08a6a;
+$accent-ink: #21140e;
+$accent-tint: #33231b;
+$green: #a3c187;
+$red: #e0655b;
+$yellow: #e0b65a;
 
-#input_container {
-    background: $boost;
-    dock: bottom;
-    height: auto;
-    margin:0 0 2 0; 
+Screen {
+    background: $bg;
+    color: $text;
 }
 
-#prompt_icon {
-    width: 2;
-    content-align: right middle;
-    margin:1 0 0 0;
+/* ------------------------------------------------------- *
+ *  Top bar
+ * ------------------------------------------------------- */
+#topbar {
+    height: 3;
+    dock: top;
+    background: $surface;
+    border-bottom: solid $border-soft;
+    padding: 0 2;
+    align-vertical: middle;
 }
 
-#prompt_input {
-    border: transparent;
-    width: 95%;
-    background: transparent;
-    
+#brand {
+    width: auto;
+    height: 100%;
+    align-vertical: middle;
 }
 
-Input {
+#brand-icon {
+    width: 4;
+    height: 100%;
+    content-align: center middle;
+    color: $accent;
+    text-style: bold;
+}
+
+#brand-title {
+    width: auto;
+    height: 100%;
+    content-align: left middle;
+    text-style: bold;
+    color: $text;
+}
+
+#topbar-gap {
+    width: 1fr;
+}
+
+.chip {
+    width: auto;
+    height: 1;
+    margin: 0 0 0 1;
+    padding: 0 2;
+    background: $surface-3;
     border: none;
-    margin: 0;
+    color: $muted;
+    content-align: center middle;
+}
+
+.chip.ok {
+    color: $green;
+    background: #21281e;
+}
+
+.chip.warn {
+    color: $yellow;
+    background: #2a2518;
+}
+
+.chip.err {
+    color: $red;
+    background: #2a1e1c;
+}
+
+/* ------------------------------------------------------- *
+ *  Chat area
+ * ------------------------------------------------------- */
+#chat-scroll {
+    height: 1fr;
+    width: 100%;
+    padding: 1 3 1 3;
+    scrollbar-size-vertical: 1;
+    scrollbar-color: $accent;
+    scrollbar-background: $surface;
+}
+
+/* Welcome */
+#welcome-box {
+    height: auto;
+    margin: 6 10 2 10;
+    padding: 2 3;
+    background: $surface;
+    border: round $border;
+    color: $muted;
+    text-wrap: wrap;
+}
+
+#suggestions {
+    height: auto;
+    margin: 0 10 4 10;
+    align-horizontal: left;
+}
+
+.suggestion {
+    width: auto;
+    height: 3;
+    margin: 0 1 0 0;
+    padding: 0 2;
+    border: tall $border;
+    background: $surface-2;
+    color: $muted;
+}
+
+.suggestion:hover {
+    border: tall $accent;
+    color: $text;
+}
+
+.suggestion:focus {
+    border: tall $accent;
+}
+
+/* ------------------------------------------------------- *
+ *  Messages
+ * ------------------------------------------------------- */
+.message {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1;
+}
+
+.message > .row {
+    width: 100%;
+    height: auto;
+    align-vertical: top;
+}
+
+.message.user > .row {
+    align-horizontal: right;
+}
+
+.message.agent > .row {
+    align-horizontal: left;
+}
+
+.avatar {
+    width: 3;
+    height: 3;
+    content-align: center middle;
+    border: round $border;
+    background: $surface-2;
+    text-style: bold;
+    color: $faint;
+}
+
+.avatar.agent-avatar {
+    margin-right: 1;
+    color: $accent;
+    border: round $accent;
+}
+
+.avatar.user-avatar {
+    margin-left: 1;
+}
+
+.message .body {
+    width: auto;
+    max-width: 90;
+    height: auto;
+}
+
+.user-bubble {
+    width: auto;
+    max-width: 90;
+    height: auto;
+    padding: 0 2;
+    background: $accent-tint;
+    border: round $accent;
+    color: #f2d9cb;
+    text-wrap: wrap;
+}
+
+.agent-meta {
+    width: auto;
+    max-width: 90;
+    height: 1;
+    padding: 0 0 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+.stream {
+    width: auto;
+    max-width: 90;
+    height: auto;
+    padding: 0 0 0 1;
+    color: $text;
+    text-wrap: wrap;
+}
+
+.stream.error {
+    color: $red;
+}
+
+.assistant .markdown {
+    padding: 0 0 0 1;
+    color: $text;
+}
+
+/* ------------------------------------------------------- *
+ *  Tool status chips
+ * ------------------------------------------------------- */
+.status-chip {
+    height: 1;
+    width: auto;
+    margin: 0 0 0 1;
+}
+
+.chip-icon {
+    width: 2;
+    height: 1;
+    content-align: left middle;
+    color: $yellow;
+}
+
+.chip-icon.done {
+    color: $green;
+}
+
+.chip-text {
+    width: auto;
+    height: 1;
+    color: $muted;
+}
+
+/* ------------------------------------------------------- *
+ *  Composer
+ * ------------------------------------------------------- */
+#composer-wrap {
+    dock: bottom;
+    height: 4;
+    padding: 0 2;
+    background: $surface;
+    border-top: solid $border-soft;
+    align-vertical: middle;
+}
+
+#composer {
+    width: 1fr;
+    height: 3;
+    padding: 0 2;
+    background: $surface-2;
+    border: round $border;
+    color: $text;
+}
+
+#composer:focus {
+    border: round $accent;
+}
+
+#composer:disabled {
+    opacity: 0.45;
+}
+
+#send-btn {
+    width: 10;
+    height: 3;
+    margin-left: 1;
+    background: $accent;
+    color: $accent-ink;
+    border: none;
+    text-style: bold;
+}
+
+#send-btn:hover {
+    background: $accent-hi;
+}
+
+#send-btn:focus {
+    background: $accent-hi;
+}
+
+#send-btn:disabled {
+    background: $surface-3;
+    color: $faint;
+}
+
+/* ------------------------------------------------------- *
+ *  Footer
+ * ------------------------------------------------------- */
+Footer {
+    background: $surface;
+    color: $muted;
+}
+
+Footer > .footer--key {
+    color: $accent;
+}
+
+Footer > .footer--description {
+    color: $muted;
 }

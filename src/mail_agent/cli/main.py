@@ -220,6 +220,25 @@ def start() -> None:
     asyncio.run(_run_chat_loop())
 
 
+@app.command()
+def tui() -> None:
+    """Launch the modern chat TUI."""
+    config = load_config()
+    if not config.get("user_mail"):
+        _print_error(
+            "Agent setup is incomplete. Run [bold]mail-agent setup[/bold] to configure your account first."
+        )
+        raise typer.Exit(code=1)
+
+    if not is_ollama_running():
+        _print_error("Ollama isn't running. Start it and try again.")
+        raise typer.Exit(code=1)
+
+    from mail_agent.tui.app import MailTUI
+
+    MailTUI().run()
+
+
 # --------------------------------------------------------------------------- #
 # Setup
 # --------------------------------------------------------------------------- #

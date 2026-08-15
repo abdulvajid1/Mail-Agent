@@ -64,6 +64,7 @@ mail-agent start
 |---|---|
 | `mail-agent setup` | Pick a model, wire up Gmail, and choose tools |
 | `mail-agent start` | Start an interactive chat session |
+| `mail-agent tui` | Launch the modern chat TUI (Textual) |
 | `mail-agent mail-auth` | Authorize Gmail access if it isn't already set up |
 | `mail-agent enable-email` | Enable (or disable) the mail-sending tool |
 | `mail-agent clear-config` | Reset/disable the mail tool |
