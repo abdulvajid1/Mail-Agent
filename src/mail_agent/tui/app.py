@@ -103,9 +103,9 @@ class MessageBubble(Vertical):
             if self.role == "user":
                 with Vertical(classes="body"):
                     yield Static(self._content, classes="bubble user-bubble", markup=False)
-                yield Static("Y", classes="avatar user-avatar", markup=False)
+                yield Static("You", classes="avatar user-avatar", markup=False)
             else:
-                yield Static("M", classes="avatar agent-avatar", markup=False)
+                yield Static("Assistent", classes="avatar agent-avatar", markup=False)
                 with Vertical(classes="body"):
                     yield Static("Mail Agent", classes="meta agent-meta", markup=False)
                     self._stream = Static(classes="stream", markup=False)
