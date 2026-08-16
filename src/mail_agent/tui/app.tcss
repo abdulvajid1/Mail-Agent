@@ -28,33 +28,33 @@ Screen {
  * ------------------------------------------------------- */
 #topbar {
     height: 3;
+    width: 100%;
     dock: top;
     background: $surface;
-    border-bottom: solid $border-soft;
-    padding: 0 2;
-    align-vertical: middle;
+    align: left middle;
+    border-bottom: outer $border-soft;
+    padding: 1 0 0 0;
 }
 
 #brand {
     width: auto;
-    height: 100%;
-    align-vertical: middle;
+    height: auto;
 }
 
 #brand-icon {
     width: 4;
-    height: 100%;
-    content-align: center middle;
+    height: auto;
     color: $accent;
     text-style: bold;
+    content-align: center middle;
 }
 
 #brand-title {
     width: auto;
-    height: 100%;
-    content-align: left middle;
+    height: auto;
     text-style: bold;
     color: $text;
+    content-align: left middle;
 }
 
 #topbar-gap {
@@ -105,7 +105,7 @@ Screen {
     margin: 6 10 2 10;
     padding: 2 3;
     background: $surface;
-    border: round $border;
+    border: tall $border;
     color: $muted;
     text-wrap: wrap;
 }
@@ -256,8 +256,9 @@ Screen {
     height: 4;
     padding: 0 2;
     background: $surface;
-    border-top: solid $border-soft;
+    border-top: tall $border-soft;
     align-vertical: middle;
+    margin:0 0 1 0;
 }
 
 #composer {
@@ -265,7 +266,7 @@ Screen {
     height: 3;
     padding: 0 2;
     background: $surface-2;
-    border: round $border;
+    border: tall $border;
     color: $text;
 }
 
