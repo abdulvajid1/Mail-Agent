@@ -159,10 +159,10 @@ Screen {
 }
 
 .avatar {
-    width: 3;
-    height: 3;
+    width: 13;
+    height: auto;
     content-align: center middle;
-    border: round $border;
+    border: tall $border;
     background: $surface-2;
     text-style: bold;
     color: $faint;
@@ -176,6 +176,7 @@ Screen {
 
 .avatar.user-avatar {
     margin-left: 1;
+
 }
 
 .message .body {
@@ -189,10 +190,11 @@ Screen {
     max-width: 90;
     height: auto;
     padding: 0 2;
-    background: $accent-tint;
-    border: round $accent;
-    color: #f2d9cb;
     text-wrap: wrap;
+    background: $surface-2;
+    text-style: bold;
+    color: $faint;
+    border: tall $border;
 }
 
 .agent-meta {
@@ -208,7 +210,7 @@ Screen {
     width: auto;
     max-width: 90;
     height: auto;
-    padding: 0 0 0 1;
+    padding: 1 0 0 1;
     color: $text;
     text-wrap: wrap;
 }
