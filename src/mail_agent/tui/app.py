@@ -265,15 +265,16 @@ class MailTUI(App):
                     severity="warning",
                 )
                 return
-            if not is_ollama_running():
-                conn.set_classes("chip err")
-                conn.update("● ollama offline")
-                self.notify(
-                    "Start Ollama and try again.",
-                    title="Ollama offline",
-                    severity="error",
-                )
-                return
+
+            # if not is_ollama_running():
+            #     conn.set_classes("chip err")
+            #     conn.update("● ollama offline")
+            #     self.notify(
+            #         "Start Ollama and try again.",
+            #         title="Ollama offline",
+            #         severity="error",
+            #     )
+            #     return
 
             agent = MailAgent()
             await agent.intialize()

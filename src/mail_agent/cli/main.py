@@ -202,6 +202,28 @@ def _choose_model_for_provider(provider: str) -> str:
             models = _list_openrouter_models()
         _render_model_table(models, provider)
         return questionary.select("Choose a model", choices=models).ask()
+    
+    elif provider == "huggingfacehub":
+        # We will create hf providers that list gets big as we use new huggingface models
+        config = load_config()  
+        if "hf_models" not in config:
+            config["hf_models"] = []
+        
+        if len(config["hf_models"]) == 0:
+            if questionary.confirm("You don't have any Huggingface providers models installed. Do you want to install one?").ask():
+                model = Prompt.ask("Enter your Huggingface providers model name")
+                if model not in config["hf_models"]:
+                    config["hf_models"].append(model)
+            else:
+                raise typer.Exit(code=1)
+        else:
+            config["hf_models"] = config["hf_models"][-10:]
+            model = questionary.select("Choose a model", choices=config["hf_models"]).ask()
+        
+        _print_success(f"Using model: {model}")
+        save_config(config)
+        return model
+        
 
     else:
         _print_error(f"Unknown provider: {provider}")
@@ -412,11 +434,11 @@ def setup() -> None:
     console.rule("Tools")
     enabled_tools = config.get("enabled_tools", [])
     attachment_dir = config.get("attachment_dir", "")
-    if MAIL_TOOLS not in enabled_tools and Confirm.ask("Enable the mail-sending tool?"):
-        enabled_tools.extend(MAIL_TOOLS)
-        enabled_tools = list(set(enabled_tools))  # remove duplicates
-        config["enabled_tools"] = enabled_tools
-        _print_success("Mail tool enabled.")
+
+    # checking if first tool in mail tools exist in enabled tools, 
+    # if yes surely all mailtool exist in enabled tools cause they are added together
+    if len(enabled_tools) == 0 and Confirm.ask('No tools enabled, Do you want to enable Mail Tools'):
+        config['enabled_tools'] = MAIL_TOOLS
 
     if not attachment_dir:
         if Confirm.ask("Setup Attachment Directory?"):

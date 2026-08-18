@@ -18,6 +18,11 @@ PROVIDERS = {
         "requires_api_key": True,
         "env_key": "OPENROUTER_API_KEY",
     },
+    "huggingfacehub": {
+        "name": "Hugging Face Hub (Cloud)",
+        "requires_api_key": True,
+        "env_key": "HUGGINGFACEHUB_API_TOKEN",
+    },
 }
 
 
@@ -61,6 +66,30 @@ def load_model(model_name: str | None = None, provider: str | None = None):
             model=model_name,
             api_key=api_key,
             base_url="https://openrouter.ai/api/v1",
+        )
+    
+    elif provider == "huggingfacehub":
+        from langchain_openai import ChatOpenAI
+
+        api_key = _get_env_key("huggingfacehub")
+        if not api_key:
+            raise ValueError(
+                "HUGGINGFACEHUB_API_TOKEN not set. Add it to your .env or export it in your shell."
+            )
+        
+        # llm = HuggingFaceEndpoint(
+        #     repo=model_name, 
+        #     task="text-generation",
+        #     provider='auto', 
+        #     huggingfacehub_api_token=api_key, 
+        #     streaming=True,
+        # )
+
+        # return ChatHuggingFace(llm=llm)
+        return ChatOpenAI(
+            base_url="https://router.huggingface.co/v1",
+            api_key=api_key,
+            model_name=model_name
         )
 
     else:
